@@ -1,0 +1,42 @@
+# Episode 10 Demo Pipeline
+
+trigger:
+- main
+
+variables:
+- group: AzureKeyVaultDemoGroup
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: TerraformInstaller@0
+  inputs:
+    terraformVersion: '0.12.3'
+
+- task: TerraformTaskV1@0
+  displayName: 'Terraform : init'
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'Episode 10 Connection'
+    backendAzureRmResourceGroupName: 'Marvel'
+    backendAzureRmStorageAccountName: 'terraformdemostore'
+    backendAzureRmContainerName: 'terraformstate'
+    backendAzureRmKey: 'terraform.tfstate'
+
+- task: TerraformTaskV1@0
+  displayName: 'Terraform : plan'
+  inputs:
+    provider: 'azurerm'
+    command: plan
+    commandOptions: '-var "arm_subscription_id=$(TF_VAR_arm_subscription_id)" -var "arm_principal=$(TF_VAR_arm_principal)" -var "arm_password=$(TF_VAR_arm_password)" -var "tenant_id=$(TF_VAR_tenant_id)" -var "StrongestAvenger=$(TF_VAR_StrongestAvenger)" -var "user_principal_id=$(TF_VAR_user_principal_id)" -var "hw-rg=Marvel" -var "hw-kv=Avengers5"'
+    environmentServiceNameAzureRM: 'Episode 10 Connection'
+
+- task: TerraformTaskV1@0
+  displayName: 'Terraform : apply'
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    commandOptions: '-var "arm_subscription_id=$(TF_VAR_arm_subscription_id)" -var "arm_principal=$(TF_VAR_arm_principal)" -var "arm_password=$(TF_VAR_arm_password)" -var "tenant_id=$(TF_VAR_tenant_id)" -var "StrongestAvenger=$(TF_VAR_StrongestAvenger)" -var "user_principal_id=$(TF_VAR_user_principal_id)" -var "hw-rg=Marvel" -var "hw-kv=Avengers5"'
+    environmentServiceNameAzureRM: 'Episode 10 Connection'
